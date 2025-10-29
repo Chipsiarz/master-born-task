@@ -119,7 +119,7 @@ describe("Candidate API", () => {
     expect(res.body).toHaveProperty("message", "Candidate added successfully");
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "http://localhost:4040/candidates",
+      "http://legacy-api:4040/candidates",
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/json" },

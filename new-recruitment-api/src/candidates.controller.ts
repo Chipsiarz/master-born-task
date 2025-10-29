@@ -100,7 +100,7 @@ export class CandidatesController {
       );
 
       try {
-        await fetch("http://localhost:4040/candidates", {
+        await fetch("http://legacy-api:4040/candidates", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
