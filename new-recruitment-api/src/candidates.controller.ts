@@ -46,6 +46,25 @@ export class CandidatesController {
   async create(req: Request, res: Response) {
     const candidate: Candidate = req.body;
 
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "experienceYears",
+      "status",
+      "consentDate",
+      "offers",
+    ];
+
+    for (const field of requiredFields) {
+      if (!candidate[field as keyof Candidate]) {
+        return res
+          .status(400)
+          .json({ message: `Missing required field: ${field}` });
+      }
+    }
+
     if (!candidate.offers || candidate.offers.length === 0) {
       return res
         .status(400)
@@ -53,6 +72,18 @@ export class CandidatesController {
     }
 
     try {
+      const placeholders = candidate.offers.map(() => "?").join(", ");
+      const offers = await this.db.all(
+        `SELECT id FROM jobOffers WHERE id IN (${placeholders})`,
+        ...candidate.offers
+      );
+
+      if (offers.length !== candidate.offers.length) {
+        return res
+          .status(400)
+          .json({ message: "One or more job offers do not exist" });
+      }
+
       await this.db.run(
         `INSERT INTO candidates 
           (firstName, lastName, email, phone, experienceYears, notes, status, consentDate, offers)
@@ -68,18 +99,19 @@ export class CandidatesController {
         JSON.stringify(candidate.offers)
       );
 
-      await fetch("http://localhost:4040/candidates", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "",
-        },
-        body: JSON.stringify({
-          firstName: candidate.firstName,
-          lastName: candidate.lastName,
-          email: candidate.email,
-        }),
-      });
+      try {
+        await fetch("http://localhost:4040/candidates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: candidate.firstName,
+            lastName: candidate.lastName,
+            email: candidate.email,
+          }),
+        });
+      } catch {
+        console.warn("Legacy API not available");
+      }
 
       res.status(201).json({ message: "Candidate added successfully" });
     } catch (err: any) {

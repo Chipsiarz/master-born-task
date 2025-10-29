@@ -7,6 +7,6 @@ export interface Candidate {
   notes?: string;
   status: "nowy" | "w trakcie rozmów" | "zaakceptowany" | "odrzucony";
   consentDate: string;
-  offers: string[];
+  offers: number[];
 }
 

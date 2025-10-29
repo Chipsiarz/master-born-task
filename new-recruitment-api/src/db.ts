@@ -21,8 +21,21 @@ export const setupDb = async () => {
       notes TEXT,
       status TEXT NOT NULL,
       consentDate TEXT NOT NULL,
-      offers TEXT NOT NULL -- JSON array
+      offers TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS jobOffers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      department TEXT NOT NULL
+    );
+  `);
+
+  await db.run(`INSERT INTO jobOffers (title, department) VALUES 
+    ('Frontend Developer', 'IT'),
+    ('Backend Developer', 'IT'),
+    ('HR Specialist', 'HR'),
+    ('QA Engineer', 'Quality Assurance')
   `);
 
   return db;
